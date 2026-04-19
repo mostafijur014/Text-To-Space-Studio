@@ -7,8 +7,13 @@ export async function generateAudioForSegment(
   text: string, 
   settings: GenerationSettings
 ): Promise<Blob> {
-  const apiKey = (process as any).env.API_KEY;
-  if (!apiKey) throw new Error("API Key is missing.");
+  const apiKey = (process as any)?.env?.GEMINI_API_KEY || 
+                 (process as any)?.env?.API_KEY || 
+                 import.meta.env.VITE_GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("Gemini API Key is missing. Please set GEMINI_API_KEY in your environment variables.");
+  }
 
   const ai = new GoogleGenAI({ apiKey });
   

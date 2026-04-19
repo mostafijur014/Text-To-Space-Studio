@@ -472,6 +472,11 @@ const App: React.FC = () => {
                                   <AlertCircle className="w-4 h-4" />
                                   <span className="text-xs font-medium">Failed</span>
                                 </div>
+                                {seg.error && (
+                                  <span className="text-[10px] text-rose-500 max-w-[150px] truncate" title={seg.error}>
+                                    {seg.error}
+                                  </span>
+                                )}
                               </div>
                             )}
                             {seg.status === AudioStatus.IDLE && (
