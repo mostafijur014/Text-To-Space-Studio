@@ -43,7 +43,8 @@ const App: React.FC = () => {
     speed: 1.0,
     pitch: 1.0,
     emotion: 'Neutral',
-    language: 'en-US'
+    language: 'en-US',
+    voiceContext: ''
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedVoiceId, setSelectedVoiceId] = useState('v1');
@@ -303,6 +304,19 @@ const App: React.FC = () => {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Batch Size</label>
                   <input type="number" value="3" readOnly className="w-full rounded-lg border-slate-300 shadow-sm bg-slate-50 py-2 px-3 border text-sm cursor-not-allowed" />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
+                  Custom Voice Context
+                  <span className="text-[10px] text-slate-400 font-normal">(Optional)</span>
+                </label>
+                <textarea 
+                  value={settings.voiceContext}
+                  onChange={(e) => setSettings(s => ({ ...s, voiceContext: e.target.value }))}
+                  placeholder="e.g. Steady, efficient, and unhurried. Tone is empathetic, crisp, and reassuring."
+                  className="w-full h-20 rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border text-xs resize-none"
+                />
               </div>
             </div>
           </div>

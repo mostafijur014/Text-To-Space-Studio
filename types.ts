@@ -24,6 +24,7 @@ export interface GenerationSettings {
   pitch: number;
   emotion: string;
   language: string;
+  voiceContext: string;
 }
 
 export interface VoiceOption {

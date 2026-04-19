@@ -18,6 +18,8 @@ export const VOICES: VoiceOption[] = [
   { id: 'v13', name: 'Lily', gender: 'female', baseVoice: 'Zephyr', description: 'Kind and patient' },
   { id: 'v14', name: 'Grace', gender: 'female', baseVoice: 'Zephyr', description: 'Elegant and smooth' },
   { id: 'v15', name: 'Mila', gender: 'female', baseVoice: 'Kore', description: 'Playful and fast' },
+  { id: 'v_story_f', name: 'Elena (Storyteller)', gender: 'female', baseVoice: 'Zephyr', description: 'Expressive and narrative' },
+  { id: 'v_finance_f', name: 'Sarah (Financial)', gender: 'female', baseVoice: 'Kore', description: 'Empathetic, crisp, and reassuring' },
 
   // Male Voices
   { id: 'v16', name: 'Liam', gender: 'male', baseVoice: 'Puck', description: 'Standard and neutral' },
@@ -35,6 +37,8 @@ export const VOICES: VoiceOption[] = [
   { id: 'v28', name: 'Sebastian', gender: 'male', baseVoice: 'Charon', description: 'Sophisticated' },
   { id: 'v29', name: 'Arthur', gender: 'male', baseVoice: 'Fenrir', description: 'Calm and steady' },
   { id: 'v30', name: 'Jasper', gender: 'male', baseVoice: 'Fenrir', description: 'Exciting and narrator-like' },
+  { id: 'v_story_m', name: 'David (Storyteller)', gender: 'male', baseVoice: 'Charon', description: 'Deep, rich narrative' },
+  { id: 'v_finance_m', name: 'Marcus (Financial)', gender: 'male', baseVoice: 'Charon', description: 'Steady, professional, and unhurried' },
 ];
 
 export const EMOTIONS = [

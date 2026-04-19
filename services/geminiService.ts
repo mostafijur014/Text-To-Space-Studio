@@ -17,8 +17,14 @@ export async function generateAudioForSegment(
 
   const ai = new GoogleGenAI({ apiKey });
   
-  // Format prompt with emotion/style
-  const styledPrompt = `${settings.emotion !== 'Neutral' ? `Say ${settings.emotion}: ` : ''}${text}`;
+  // Format prompt with emotion and custom voice context
+  let styledPrompt = text;
+  if (settings.voiceContext) {
+    styledPrompt = `[Character/Tone: ${settings.voiceContext}] ${styledPrompt}`;
+  }
+  if (settings.emotion !== 'Neutral') {
+    styledPrompt = `Say ${settings.emotion}: ${styledPrompt}`;
+  }
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
