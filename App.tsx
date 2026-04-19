@@ -222,6 +222,18 @@ const App: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleSaveMerged = async () => {
+    const completed = segments.filter(s => s.status === AudioStatus.COMPLETED && s.audioBlob);
+    if (completed.length === 0) return;
+    try {
+      const mergedBlob = await mergeAudioBlobs(completed.map(s => s.audioBlob!));
+      openSaveModal(mergedBlob, `Full_Narration_${Date.now()}`);
+    } catch (err) {
+      console.error("Merge failed:", err);
+      alert("Failed to merge audio segments.");
+    }
+  };
+
   const handleDownloadMerged = async () => {
     const completed = segments.filter(s => s.status === AudioStatus.COMPLETED && s.audioBlob);
     if (completed.length === 0) return;
@@ -235,6 +247,7 @@ const App: React.FC = () => {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
+      console.error("Merge download failed:", err);
       alert("Failed to merge audio segments. Try downloading as ZIP.");
     }
   };
@@ -433,29 +446,30 @@ const App: React.FC = () => {
                     
                     <div className="flex gap-2">
                       <button 
-                        onClick={async () => {
-                          const completed = segments.filter(s => s.status === AudioStatus.COMPLETED && s.audioBlob);
-                          if (completed.length === 0) return;
-                          try {
-                            const mergedBlob = await mergeAudioBlobs(completed.map(s => s.audioBlob!));
-                            openSaveModal(mergedBlob, `Full_Narration_${Date.now()}`);
-                          } catch (err) {
-                            alert("Merge failed");
-                          }
-                        }}
+                        onClick={handleSaveMerged}
                         disabled={segments.filter(s => s.status === AudioStatus.COMPLETED).length === 0}
                         className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 disabled:opacity-50 flex items-center gap-2"
+                        title="Save full narration to your library"
                       >
                         <Save className="w-4 h-4" />
                         Save Merged
                       </button>
                       <button 
+                        onClick={handleDownloadMerged}
+                        disabled={segments.filter(s => s.status === AudioStatus.COMPLETED).length === 0}
+                        className="px-4 py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg font-medium hover:bg-indigo-100 disabled:opacity-50 flex items-center gap-2"
+                        title="Download full narration as a single WAV file"
+                      >
+                        <Download className="w-4 h-4" />
+                        Download Merged
+                      </button>
+                      <button 
                         onClick={handleDownloadZip}
                         disabled={segments.filter(s => s.status === AudioStatus.COMPLETED).length === 0}
                         className="p-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 disabled:opacity-50 group"
-                        title="Download ZIP"
+                        title="Download ZIP with all segments"
                       >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                       </button>
                     </div>
                   </div>
