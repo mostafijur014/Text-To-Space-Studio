@@ -1,0 +1,6 @@
+{
+  "name": "Text To Space Studio App",
+  "description": "A powerful React application for generating long-form text-to-speech audio, featuring script segmentation, parallel processing, and multiple voice styles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
