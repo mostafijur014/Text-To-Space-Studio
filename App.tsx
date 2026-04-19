@@ -27,7 +27,8 @@ import {
   ChevronRight,
   MoreVertical,
   Search,
-  Plus
+  Plus,
+  RotateCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -139,6 +140,32 @@ const App: React.FC = () => {
     setActiveTab('processing');
   };
 
+  const stopProcessing = () => {
+    processingRef.current = false;
+    setIsProcessing(false);
+  };
+
+  const generateSingleSegment = async (segId: string) => {
+    const seg = segments.find(s => s.id === segId);
+    if (!seg) return;
+
+    setSegments(prev => prev.map(s => 
+      s.id === segId ? { ...s, status: AudioStatus.PROCESSING, error: undefined } : s
+    ));
+
+    try {
+      const audioBlob = await generateAudioForSegment(seg.text, settings);
+      setSegments(prev => prev.map(s => 
+        s.id === segId ? { ...s, status: AudioStatus.COMPLETED, audioBlob, error: undefined } : s
+      ));
+    } catch (error: any) {
+      console.error(`Error processing ${seg.name}:`, error);
+      setSegments(prev => prev.map(s => 
+        s.id === segId ? { ...s, status: AudioStatus.FAILED, error: error.message } : s
+      ));
+    }
+  };
+
   const processAllSegments = async () => {
     if (isProcessing) return;
     setIsProcessing(true);
@@ -146,41 +173,33 @@ const App: React.FC = () => {
 
     // Process in batches of 3 to avoid rate limits while maintaining speed
     const batchSize = 3;
-    const segmentsToProcess = [...segments];
+    const segmentsToProcess = segments.filter(s => s.status !== AudioStatus.COMPLETED);
 
     for (let i = 0; i < segmentsToProcess.length; i += batchSize) {
       if (!processingRef.current) break;
 
       const currentBatch = segmentsToProcess.slice(i, i + batchSize);
-      
-      await Promise.all(currentBatch.map(async (seg) => {
-        if (seg.status === AudioStatus.COMPLETED) return;
-
-        setSegments(prev => prev.map(s => 
-          s.id === seg.id ? { ...s, status: AudioStatus.PROCESSING } : s
-        ));
-
-        try {
-          const audioBlob = await generateAudioForSegment(seg.text, settings);
-          setSegments(prev => prev.map(s => 
-            s.id === seg.id ? { ...s, status: AudioStatus.COMPLETED, audioBlob } : s
-          ));
-        } catch (error: any) {
-          console.error(`Error processing ${seg.name}:`, error);
-          setSegments(prev => prev.map(s => 
-            s.id === seg.id ? { ...s, status: AudioStatus.FAILED, error: error.message } : s
-          ));
-        }
-      }));
+      await Promise.all(currentBatch.map(seg => generateSingleSegment(seg.id)));
     }
 
     setIsProcessing(false);
     processingRef.current = false;
   };
 
-  const stopProcessing = () => {
-    processingRef.current = false;
-    setIsProcessing(false);
+  const retrySegment = (segId: string) => {
+    generateSingleSegment(segId);
+  };
+
+  const formatError = (error: string) => {
+    try {
+      if (error.startsWith('{')) {
+        const parsed = JSON.parse(error);
+        if (parsed.error && parsed.error.message) return parsed.error.message;
+      }
+      return error;
+    } catch {
+      return error;
+    }
   };
 
   const handleDownloadZip = async () => {
@@ -468,13 +487,22 @@ const App: React.FC = () => {
                             )}
                             {seg.status === AudioStatus.FAILED && (
                               <div className="flex flex-col items-end">
-                                <div className="flex items-center gap-1 text-rose-600">
-                                  <AlertCircle className="w-4 h-4" />
-                                  <span className="text-xs font-medium">Failed</span>
+                                <div className="flex items-center gap-2">
+                                  <button 
+                                    onClick={() => retrySegment(seg.id)}
+                                    className="p-1 text-rose-600 hover:bg-rose-50 rounded"
+                                    title="Retry this segment"
+                                  >
+                                    <RotateCcw className="w-4 h-4" />
+                                  </button>
+                                  <div className="flex items-center gap-1 text-rose-600">
+                                    <AlertCircle className="w-4 h-4" />
+                                    <span className="text-xs font-medium">Failed</span>
+                                  </div>
                                 </div>
                                 {seg.error && (
-                                  <span className="text-[10px] text-rose-500 max-w-[150px] truncate" title={seg.error}>
-                                    {seg.error}
+                                  <span className="text-[10px] text-rose-500 max-w-[200px] text-right" title={seg.error}>
+                                    {formatError(seg.error)}
                                   </span>
                                 )}
                               </div>
